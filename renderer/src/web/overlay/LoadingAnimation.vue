@@ -5,7 +5,7 @@
     <div :class="$style.widget" v-if="show">
       <div :class="$style.box">
         <div class="py-2 px-4">
-          <div class="text-base">Awakened PoE Trade</div>
+          <div class="text-base">Awakened PoE Trade Simplified Chinese</div>
           <p>{{ t('app_is_ready') }}</p>
         </div>
       </div>
@@ -13,26 +13,20 @@
   </transition>
 </template>
 
-<script lang="ts">
-import { defineComponent, shallowRef } from 'vue'
+<script setup lang="ts">
+import { shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Host } from '@/web/background/IPC'
 import { AppConfig } from '@/web/Config'
 
-export default defineComponent({
-  setup () {
-    const show = shallowRef(false)
+const { t } = useI18n()
 
-    Host.onEvent('MAIN->OVERLAY::overlay-attached', () => {
-      if (!show.value && AppConfig().showAttachNotification) {
-        show.value = true
-        setTimeout(() => { show.value = false }, 2500)
-      }
-    })
+const show = shallowRef(false)
 
-    const { t } = useI18n()
-
-    return { t, show }
+Host.onEvent('MAIN->OVERLAY::overlay-attached', () => {
+  if (!show.value && AppConfig().showAttachNotification) {
+    show.value = true
+    setTimeout(() => { show.value = false }, 2500)
   }
 })
 </script>

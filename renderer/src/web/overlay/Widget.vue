@@ -258,6 +258,7 @@ export default defineComponent({
   background: rgba(0,0,0, 0.3);
   display: flex;
   flex-direction: column;
+  white-space:nowrap;
   @apply rounded;
 }
 

@@ -17,7 +17,7 @@
     </div>
   </div>
   <div :class="$style.window" class="grow layout-column" :onMouseenter="hidePodium">
-    <app-titlebar @close="cancel" :title="t('settings.title')" />
+    <AppTitleBar @close="cancel" :title="t('settings.title')" />
     <div class="flex grow min-h-0">
       <div class="pl-2 pt-2 bg-gray-900 flex flex-col gap-1" style="min-width: 10rem;">
         <template v-for="item of menuItems">
@@ -29,8 +29,8 @@
         <button v-if="menuItems.length >= 4"
           :class="$style['quit-btn']" @click="quit">{{ t('app.quit') }}</button>
         <div class="text-gray-400 text-center mt-auto pr-3 pt-4 pb-12" style="max-width: fit-content; min-width: 100%;">
-          <img class="mx-auto mb-1" src="/images/peepoLove2x.webp">
-          {{ t('Support development on') }}<br> <a href="https://patreon.com/awakened_poe_trade" class="inline-flex mt-1" target="_blank"><img class="inline h-5" src="/images/Patreon.svg"></a>
+          {{ t('Support development on') }}<br> <a href="https://patreon.com/awakened_poe_trade" class="inline-flex mt-1" target="_blank"><img class="inline h-5" src="/images/Patreon.svg"></a><br>
+          {{ t('Support development CN on') }}<br> <a href="https://afdian.net/a/APTSimplifiedChinese/plan" class="inline-flex mt-1" target="_blank"><img class="inline h-5" src="/images/aifadain.png"></a>
         </div>
       </div>
       <div class="text-gray-100 grow layout-column bg-gray-900">
@@ -55,6 +55,7 @@ import { AppConfig, updateConfig, saveConfig, pushHostConfig, Config } from '@/w
 import { APP_PATRONS } from '@/assets/data'
 import { Host } from '@/web/background/IPC'
 import type { Widget, WidgetManager } from '@/web/overlay/interfaces'
+import AppTitleBar from '@/web/ui/AppTitlebar.vue'
 import SettingsHotkeys from './hotkeys.vue'
 import SettingsChat from './chat.vue'
 import SettingsGeneral from './general.vue'
@@ -86,6 +87,7 @@ function quit () {
 }
 
 export default defineComponent({
+  components: { AppTitleBar },
   props: {
     config: {
       type: Object as PropType<Widget>,

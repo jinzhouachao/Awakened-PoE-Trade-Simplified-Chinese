@@ -1,6 +1,6 @@
 'use strict'
 
-import { app } from 'electron'
+import { app, dialog } from 'electron'
 import { uIOhook } from 'uiohook-napi'
 import os from 'node:os'
 import { startServer, eventPipe, server } from './server'
@@ -16,6 +16,13 @@ import { GameLogWatcher } from './host-files/GameLogWatcher'
 import { HttpProxy } from './proxy'
 
 if (!app.requestSingleInstanceLock()) {
+  dialog.showErrorBox(
+      '未获取到锁',
+      // ----------------------
+      '未获取到锁\n' +
+      '理论上是你已经打开了软件\n' +
+      '但是还在继续查找原因'
+  )
   app.exit()
 }
 
@@ -45,6 +52,7 @@ app.on('ready', async () => {
         gameConfig.readConfig(cfg.gameConfig)
         appUpdater.checkAtStartup()
         tray.overlayKey = cfg.overlayKey
+        httpProxy.updateCookies(cfg.poesessid, cfg.realm)
       })
       uIOhook.start()
       const port = await startServer(appUpdater, logger)

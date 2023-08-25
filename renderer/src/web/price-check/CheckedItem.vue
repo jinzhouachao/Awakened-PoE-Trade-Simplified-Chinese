@@ -9,7 +9,7 @@
       :item="item"
       :filters="itemFilters" />
     <filters-block
-      ref="filtersBlock"
+      ref="filtersComponent"
       :filters="itemFilters"
       :stats="itemStats"
       :item="item"
@@ -37,6 +37,7 @@
     <stack-value :filters="itemFilters" :item="item"/>
     <div v-if="showSupportLinks" class="mt-auto border border-dashed p-2">
       <div class="mb-1">{{ t('Support development on') }} <a href="https://patreon.com/awakened_poe_trade" class="inline-flex align-middle animate__animated animate__fadeInRight" target="_blank"><img class="inline h-5" src="/images/Patreon.svg"></a></div>
+      <div class="mb-1">{{ t('Support development CN on') }} <a href="https://afdian.net/a/APTSimplifiedChinese/plan" class="inline-flex align-middle animate__animated animate__fadeInRight" target="_blank"><img class="inline h-5" src="/images/aifadain.png"></a></div>
       <i18n-t keypath="app.thanks_3rd_party" tag="div">
         <a href="https://poeprices.info" target="_blank" class="bg-gray-900 px-1 rounded">poeprices.info</a>
         <a href="https://poe.ninja/support" target="_blank" class="bg-gray-900 px-1 rounded">poe.ninja</a>
@@ -102,7 +103,7 @@ export default defineComponent({
     // TradeListing.vue OR TradeBulk.vue
     const tradeService = ref<{ execSearch(): void } | null>(null)
     // FiltersBlock.vue
-    const filtersBlock = ref<ComponentPublicInstance<{}, {}>>(null!)
+    const filtersComponent = ref<ComponentPublicInstance>(null!)
 
     watch(() => props.item, (item, prevItem) => {
       const prevCurrency = (presets.value != null) ? itemFilters.value.trade.currency : undefined
@@ -112,7 +113,8 @@ export default defineComponent({
         collapseListings: widget.value.collapseListings,
         activateStockFilter: widget.value.activateStockFilter,
         searchStatRange: widget.value.searchStatRange,
-        useEn: (AppConfig().language === 'cmn-Hant' && AppConfig().realm === 'pc-ggg'),
+        offline: widget.value.offline,
+        useEn: ((AppConfig().language === 'cmn-Hant' || AppConfig().language === 'zh_CN') && AppConfig().realm === 'pc-ggg'),
         currency: widget.value.rememberCurrency || (prevItem &&
           item.info.namespace === prevItem.info.namespace &&
           item.info.refName === prevItem.info.refName
@@ -194,7 +196,7 @@ export default defineComponent({
     })
 
     function handleSearchMouseenter (e: MouseEvent) {
-      if ((filtersBlock.value.$el as HTMLElement).contains(e.relatedTarget as HTMLElement)) {
+      if ((filtersComponent.value.$el as HTMLElement).contains(e.relatedTarget as HTMLElement)) {
         doSearch.value = true
 
         if (document.activeElement instanceof HTMLElement) {
@@ -225,7 +227,7 @@ export default defineComponent({
       doSearch,
       tradeAPI,
       tradeService,
-      filtersBlock,
+      filtersComponent,
       showPredictedPrice,
       show,
       handleSearchMouseenter,

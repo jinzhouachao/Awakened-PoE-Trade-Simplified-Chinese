@@ -8,6 +8,7 @@ import { CATEGORY_TO_TRADE_ID } from '../trade/pathofexile-trade'
 export const SPECIAL_SUPPORT_GEM = ['Empower Support', 'Enlighten Support', 'Enhance Support']
 
 interface CreateOptions {
+  offline: boolean
   league: string
   currency: string | undefined
   collapseListings: 'app' | 'api'
@@ -23,7 +24,7 @@ export function createFilters (
   const filters: ItemFilters = {
     searchExact: {},
     trade: {
-      offline: false,
+      offline: opts.offline,
       onlineInLeague: false,
       listed: undefined,
       currency: opts.currency,
@@ -194,7 +195,7 @@ export function createFilters (
     }
   }
 
-  if (item.sockets?.linked) {
+  if (item.sockets?.linked && !(item.info.refName === 'Skin of the Lords' || item.info.refName === 'Skin of the Loyal')) {
     filters.linkedSockets = {
       value: item.sockets.linked,
       disabled: false
@@ -204,6 +205,27 @@ export function createFilters (
   if (item.sockets?.white) {
     filters.whiteSockets = {
       value: item.sockets.white,
+      disabled: false
+    }
+  }
+
+  if (item.sockets?.red && (item.info.refName === 'Skin of the Lords' || item.info.refName === 'Skin of the Loyal')) {
+    filters.redSockets = {
+      value: item.sockets.red,
+      disabled: false
+    }
+  }
+
+  if (item.sockets?.green && (item.info.refName === 'Skin of the Lords' || item.info.refName === 'Skin of the Loyal')) {
+    filters.greenSockets = {
+      value: item.sockets.green,
+      disabled: false
+    }
+  }
+
+  if (item.sockets?.blue && (item.info.refName === 'Skin of the Lords' || item.info.refName === 'Skin of the Loyal')) {
+    filters.blueSockets = {
+      value: item.sockets.blue,
       disabled: false
     }
   }

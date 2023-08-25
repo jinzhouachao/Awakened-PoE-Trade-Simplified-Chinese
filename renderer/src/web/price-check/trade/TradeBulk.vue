@@ -27,24 +27,24 @@
         <thead>
           <tr class="text-left">
             <th class="trade-table-heading">
-              <div class="px-2">{{ t(':price') }}</div>
+              <div class="px-2" style="width: max-content;">{{ t(':price') }}</div>
             </th>
             <th class="trade-table-heading">
-              <div class="pl-1 pr-2 flex text-xs" style="line-height: 1.3125rem;"><span class="w-8 inline-block text-right -ml-px mr-px">{{ (selectedCurr === 'xchgChaos') ? 'chaos' : 'div' }}</span><span>{{ '\u2009' }}/{{ '\u2009' }}</span><span class="w-8 inline-block">{{ t(':bulk') }}</span></div>
+              <div class="pl-1 pr-2 flex text-xs" style="line-height: 1.3125rem; width: max-content;"><span class="w-8 inline-block text-right -ml-px mr-px">{{ (selectedCurr === 'xchgChaos') ? 'chaos' : 'div' }}</span><span>{{ '\u2009' }}/{{ '\u2009' }}</span><span class="w-8 inline-block">{{ t(':bulk') }}</span></div>
             </th>
             <th class="trade-table-heading">
-              <div class="px-1">{{ t(':stock') }}</div>
+              <div class="px-1" style="width: max-content;">{{ t(':stock') }}</div>
             </th>
             <th class="trade-table-heading">
-              <div class="px-1">{{ t(':fulfill') }}</div>
+              <div class="px-1 w-20" style="width: max-content;">{{ t(':fulfill') }}</div>
             </th>
             <th class="trade-table-heading" :class="{ 'w-full': !showSeller }">
-              <div class="pr-2 pl-4">
+              <div class="pr-2 pl-4" style="width: max-content;">
                 <span class="ml-1" style="padding-left: 0.375rem;">{{ t(':listed') }}</span>
               </div>
             </th>
             <th v-if="showSeller" class="trade-table-heading w-full">
-              <div class="px-2">{{ t(':seller') }}</div>
+              <div class="px-2" style="width: max-content;">{{ t(':seller') }}</div>
             </th>
           </tr>
         </thead>
@@ -80,12 +80,13 @@
     <p>Error: {{ error }}</p>
     <template #actions>
       <button class="btn" @click="execSearch">{{ t('Retry') }}</button>
+      <button class="btn" @click="openTradeLink">{{ t('Browser') }}</button>
     </template>
   </ui-error-box>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, computed, watch, ComputedRef, Ref, shallowRef, shallowReactive } from 'vue'
+import { defineComponent, PropType, computed, watch, ComputedRef, Ref, shallowRef, shallowReactive, inject } from 'vue'
 import { useI18nNs } from '@/web/i18n'
 import { BulkSearch, execBulkSearch, createTradeRequest, PricingResult } from './pathofexile-bulk'
 import { getTradeEndpoint } from './common'
@@ -195,6 +196,8 @@ export default defineComponent({
     const widget = computed(() => AppConfig<PriceCheckWidget>('price-check')!)
     const { error, result, search } = useBulkApi()
 
+    const showBrowser = inject<(url: string) => void>('builtin-browser')!
+
     const selectedCurr = shallowRef<'xchgChaos' | 'xchgStable'>('xchgChaos')
 
     watch(() => props.item, (item) => {
@@ -222,6 +225,13 @@ export default defineComponent({
       }
     })
 
+    function makeTradeLink (_have?: string[]) {
+      const have = _have ?? ((selectedCurr.value === 'xchgStable') ? ['divine'] : ['chaos'])
+      const httpPostBody = createTradeRequest(props.filters, props.item, have)
+      const httpGetQuery = { exchange: httpPostBody.query }
+      return `https://${getTradeEndpoint()}/trade/exchange/${props.filters.trade.league}?q=${JSON.stringify(httpGetQuery)}`
+    }
+
     const { t } = useI18nNs('trade_result')
 
     return {
@@ -232,11 +242,9 @@ export default defineComponent({
       selectedCurr,
       execSearch: () => { search(props.item, props.filters) },
       showSeller: computed(() => widget.value.showSeller),
-      makeTradeLink () {
-        const have = (selectedCurr.value === 'xchgStable') ? ['divine'] : ['chaos']
-        const httpPostBody = createTradeRequest(props.filters, props.item, have)
-        const httpGetQuery = { exchange: httpPostBody.query }
-        return `https://${getTradeEndpoint()}/trade/exchange/${props.filters.trade.league}?q=${JSON.stringify(httpGetQuery)}`
+      makeTradeLink,
+      openTradeLink () {
+        showBrowser(makeTradeLink(['mirror']))
       }
     }
   }
